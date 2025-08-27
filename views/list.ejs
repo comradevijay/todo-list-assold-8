@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo List</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header>
+    <h1>✅ Todo List</h1>
+  </header>
+
+  <main>
+    <form action="/add" method="POST" class="task-form">
+      <input type="text" name="task" placeholder="Enter a task">
+      <button type="submit">+</button>
+    </form>
+
+    <ul class="task-list">
+      <% tasks.forEach((task, i) => { %>
+        <li class="<%= task.done ? 'done' : '' %>">
+          <form action="/toggle/<%= i %>" method="POST" style="display:inline;">
+            <input type="checkbox" onchange="this.form.submit()" <%= task.done ? 'checked' : '' %>>
+          </form>
+          <span><%= task.text %></span>
+          <form action="/delete/<%= i %>" method="POST" style="display:inline;">
+            <button class="delete-btn">✖</button>
+          </form>
+        </li>
+      <% }) %>
+    </ul>
+  </main>
+
+  <footer>
+    <p>© 2025 Todo App | Node.js + EJS</p>
+  </footer>
+</body>
+</html>
