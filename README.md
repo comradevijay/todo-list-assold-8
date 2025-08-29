@@ -1,26 +1,102 @@
-# ✅ Advanced Todo List Web Application
+# ✅ Todo List Web Application
 
-This project is a dynamic and interactive to-do list application built to manage tasks efficiently. It allows users to create, edit (priority), and delete tasks, with all data persistently stored in a MongoDB Atlas database. The frontend is rendered dynamically using EJS templates.
+## **Project Overview**
 
----
-
-## 🛠️ Technology Stack
-
-* **Backend:** Node.js, Express.js
-* **Database:** MongoDB (with Mongoose ODM) hosted on MongoDB Atlas
-* **Frontend:** EJS (Embedded JavaScript) for dynamic HTML templating
-* **Styling:** CSS3
+This is a modern **Todo List web application** built with **Node.js, Express, EJS, and MongoDB**. It allows users to efficiently manage tasks by adding, editing, deleting, and marking tasks as completed. The application uses **MongoDB Atlas** for data storage, ensuring that all tasks are stored persistently.
 
 ---
 
-## ✨ Features
+## **Features**
 
-* **Create Tasks:** Add new tasks with a title and a priority level (Low, High, Urgent).
-* **Empty Task Validation:** Prevents the creation of tasks without a title and shows an alert.
-* **Edit Task Priority:** Seamlessly update the priority of any existing task directly from the list.
-* **Delete Tasks:** Remove tasks individually with a single click.
-* **User-Friendly Alerts:** Clear browser alerts for successful creation, updates, and deletions.
-* **Persistent Storage:** All tasks are stored securely in a cloud-based MongoDB Atlas database.
-* **Responsive Design:** A clean and modern UI that works on all screen sizes.
+* **Add Tasks:** Users can add new tasks with a title and priority (`Low`, `High`, `Urgent`). Empty titles are not allowed.
+* **Edit Tasks:** Edit task priority using a **pencil icon**.
+* **Delete Tasks:** Remove tasks individually with **confirmation alert**.
+* **Mark as Completed:** Check a task to mark it as completed (line-through + gray).
+* **Alerts:** Notifications appear on task addition, update, deletion, or empty input.
+* **Responsive UI:** Clean and responsive layout for desktop and mobile devices.
 
 ---
+
+## **Technology Stack**
+
+| Layer      | Technology                           |
+| ---------- | ------------------------------------ |
+| Frontend   | HTML, CSS, EJS (Embedded JavaScript) |
+| Backend    | Node.js, Express.js                  |
+| Database   | MongoDB Atlas                        |
+| Deployment | Render (Node.js Web Service)         |
+
+---
+
+## **Database Structure**
+
+MongoDB collection: **`tasks`**
+
+| Field       | Type    | Description                              |
+| ----------- | ------- | ---------------------------------------- |
+| `title`     | String  | Title of the task                        |
+| `priority`  | String  | Task priority: `Low`, `High`, `Urgent`   |
+| `completed` | Boolean | Whether task is completed (`true/false`) |
+
+---
+
+## **Installation & Setup**
+
+1. Clone the repository:
+
+```bash
+git clone <your-repo-link>
+cd todo-app
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Create a `.env` file in the root directory with your MongoDB Atlas URI:
+
+```
+MONGO_URI=your_mongodb_atlas_connection_string
+PORT=8000
+```
+
+4. Run the application locally:
+
+```bash
+node index.js
+```
+
+5. Open your browser and navigate to:
+
+```
+http://localhost:8000
+```
+
+---
+
+## **Deployment**
+
+The project is deployed on **Render**.
+
+* **Render Deployment Link:** [https://your-render-link.onrender.com](https://your-render-link.onrender.com)
+
+> Make sure to update the link with your actual deployment URL.
+
+---
+
+## **Usage**
+
+1. Add a new task by entering a title and selecting priority, then click `+`.
+2. Edit task priority by clicking the **pencil icon**, select new priority, and click ✔️.
+3. Mark a task as completed by checking the checkbox. Completed tasks appear gray with line-through.
+4. Delete a task by clicking the trash 🗑️ icon.
+
+
+## **Project Submission**
+
+* **Server file:** `index.js`
+* **Frontend:** `list.ejs` & `styles.css`
+* **Deployment:** Render
+* **GitHub Repository:** `https://github.com/comradevijay/todo-list-assold-8`
