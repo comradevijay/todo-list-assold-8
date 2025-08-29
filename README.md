@@ -45,7 +45,7 @@ MongoDB collection: **`tasks`**
 1. Clone the repository:
 
 ```bash
-git clone <your-repo-link>
+git clone https://github.com/comradevijay/todo-list-assold-8
 cd todo-app
 ```
 
