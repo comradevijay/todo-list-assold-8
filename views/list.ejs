@@ -12,7 +12,6 @@
     </header>
 
     <main>
-      <!-- Add Task Form -->
       <form action="/add" method="POST" class="task-form" id="addTaskForm">
         <input type="text" name="task" placeholder="Enter a task" required />
         <select name="priority">
@@ -23,12 +22,10 @@
         <button type="submit">+</button>
       </form>
 
-      <!-- Task List -->
       <ul class="task-list">
         <% tasks.forEach((task) => { %>
         <li class="priority-<%= task.priority.toLowerCase() %> <%= task.completed ? 'completed' : '' %>">
 
-          <!-- Completed Checkbox -->
           <form action="/toggle/<%= task._id %>" method="POST" class="complete-form">
             <input type="checkbox" name="completed" onchange="this.form.submit()" <%= task.completed ? 'checked' : '' %> />
           </form>
@@ -37,7 +34,6 @@
 
           <div class="task-actions">
 
-            <!-- Pencil Icon for Edit -->
             <button type="button" class="edit-btn" onclick="document.getElementById('editForm-<%= task._id %>').style.display='inline'">✏️</button>
 
             <form id="editForm-<%= task._id %>" action="/edit/<%= task._id %>" method="POST" style="display:none;" class="action-form">
