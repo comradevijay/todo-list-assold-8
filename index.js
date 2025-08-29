@@ -1,33 +1,40 @@
-// index.js
 const express = require("express");
-const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const dotenv = require("dotenv");
-const path = require("path");
-
-dotenv.config();
+const mongoose = require("mongoose");
+require("dotenv").config();
 
 const app = express();
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(express.static("public"));
+app.set("view engine", "ejs");
 
-// Serve static files (if you have frontend views/public folder)
-app.use(express.static(path.join(__dirname, "public")));
+// Environment variables
+const PORT = process.env.PORT || 8000;
+const MONGO_URI = process.env.MONGO_URI;
 
-// MongoDB Connection
+// ✅ Check Mongo URI
+if (!MONGO_URI) {
+  console.error("❌ No MONGO_URI found in environment!");
+  process.exit(1);
+}
+
+// Connect to MongoDB
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("✅ Connected to MongoDB Atlas"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+  .connect(MONGO_URI)
+  .then(() => console.log("✅ Connected to MongoDB"))
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:", err);
+    process.exit(1);
+  });
 
 // Schema & Model
 const taskSchema = new mongoose.Schema({
-  name: String,
+  name: {
+    type: String,
+    required: true,
+  },
 });
 
 const Task = mongoose.model("Task", taskSchema);
@@ -35,28 +42,33 @@ const Task = mongoose.model("Task", taskSchema);
 // Routes
 app.get("/", async (req, res) => {
   try {
-    const tasks = await Task.find();
-    res.json(tasks); // you can render a template instead if using EJS
+    const tasks = await Task.find({});
+    res.render("index", { tasks: tasks });
   } catch (err) {
-    res.status(500).send("Error fetching tasks");
+    res.status(500).send("❌ Error fetching tasks: " + err);
   }
 });
 
-app.post("/add", async (req, res) => {
+app.post("/addtask", async (req, res) => {
   try {
-    const task = new Task({ name: req.body.name });
+    const task = new Task({ name: req.body.task });
     await task.save();
-    res.redirect("/"); // or res.json(task) if frontend is React
+    res.redirect("/");
   } catch (err) {
-    res.status(500).send("Error saving task");
+    res.status(500).send("❌ Error adding task: " + err);
   }
 });
 
-// For Render health check
-app.get("/health", (req, res) => res.send("OK"));
+app.post("/deletetask", async (req, res) => {
+  try {
+    await Task.findByIdAndDelete(req.body.taskId);
+    res.redirect("/");
+  } catch (err) {
+    res.status(500).send("❌ Error deleting task: " + err);
+  }
+});
 
-// Use Render’s PORT
-const PORT = process.env.PORT || 8000;
+// Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
