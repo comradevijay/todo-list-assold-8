@@ -1,11 +1,13 @@
 const express = require("express");
+const methodOverride = require("method-override"); // 1. Require the package
 const app = express();
 
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
+app.use(methodOverride("_method")); // 2. Use the middleware
 
-// in-memory storage
+// In-memory storage
 let tasks = [];
 
 app.get("/", (req, res) => {
@@ -15,21 +17,29 @@ app.get("/", (req, res) => {
 app.post("/add", (req, res) => {
   const task = req.body.task;
   if (task.trim() === "") {
-    return res.send("<script>alert('Task cannot be empty'); window.location.href='/'</script>");
+    return res.send(
+      "<script>alert('Task cannot be empty'); window.location.href='/'</script>"
+    );
   }
   tasks.push({ text: task, done: false });
   res.redirect("/");
 });
 
-app.post("/toggle/:index", (req, res) => {
+// 3. Changed from app.post to app.put
+app.put("/toggle/:index", (req, res) => {
   const index = req.params.index;
-  tasks[index].done = !tasks[index].done;
+  if (tasks[index]) {
+    tasks[index].done = !tasks[index].done;
+  }
   res.redirect("/");
 });
 
-app.post("/delete/:index", (req, res) => {
+// 4. Changed from app.post to app.delete
+app.delete("/delete/:index", (req, res) => {
   const index = req.params.index;
-  tasks.splice(index, 1);
+  if (tasks[index]) {
+    tasks.splice(index, 1);
+  }
   res.redirect("/");
 });
 
