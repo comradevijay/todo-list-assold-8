@@ -1,38 +1,114 @@
 const express = require("express");
+const mongoose = require("mongoose");
+require("dotenv").config();
+
 const app = express();
-
 app.set("view engine", "ejs");
-app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
 
-// in-memory storage
-let tasks = [];
+const PORT = process.env.PORT || 8000;
 
-app.get("/", (req, res) => {
-  res.render("list", { tasks });
+// --- MongoDB Connection ---
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify:false
+})
+.then(() => console.log("✅ Connected to MongoDB"))
+.catch(err => console.error("❌ MongoDB Connection Error:", err));
+
+// --- Schema ---
+const taskSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  priority: { type: String, enum: ["High", "Low", "Urgent"], default: "Low" },
+  completed: { type: Boolean, default: false } // New field for completed tasks
 });
 
-app.post("/add", (req, res) => {
-  const task = req.body.task;
-  if (task.trim() === "") {
-    return res.send("<script>alert('Task cannot be empty'); window.location.href='/'</script>");
+// --- Model ---
+const Task = mongoose.model("Task", taskSchema);
+
+// --- Routes ---
+
+// GET home page
+app.get("/", function (req, res) {
+  Task.find({}, function (err, foundItems) {
+    if (err) {
+      console.log(err);
+      res.render("list", { tasks: [], message: null });
+    } else {
+      res.render("list", { tasks: foundItems, message: req.query.message });
+    }
+  });
+});
+
+// POST /add - add new task
+app.post("/add", function (req, res) {
+  const itemTitle = req.body.task;
+  const itemPriority = req.body.priority;
+
+  if (!itemTitle || itemTitle.trim() === "") {
+    return res.redirect("/?message=empty_task");
   }
-  tasks.push({ text: task, done: false });
-  res.redirect("/");
+
+  const task = new Task({ title: itemTitle, priority: itemPriority });
+
+  task.save(function (err) {
+    if (err) {
+      console.log(err);
+      res.redirect("/");
+    } else {
+      res.redirect("/?message=add_success");
+    }
+  });
 });
 
-app.post("/toggle/:index", (req, res) => {
-  const index = req.params.index;
-  tasks[index].done = !tasks[index].done;
-  res.redirect("/");
+// POST /edit/:id - edit task priority
+app.post("/edit/:id", function (req, res) {
+  const taskId = req.params.id;
+  const newPriority = req.body.priority;
+
+  Task.findByIdAndUpdate(taskId, { priority: newPriority }, function (err) {
+    if (err) {
+      console.log(err);
+      res.redirect("/");
+    } else {
+      res.redirect("/?message=update_success");
+    }
+  });
 });
 
-app.post("/delete/:index", (req, res) => {
-  const index = req.params.index;
-  tasks.splice(index, 1);
-  res.redirect("/");
+// POST /delete/:id - delete task
+app.post("/delete/:id", function (req, res) {
+  const taskId = req.params.id;
+  Task.findByIdAndRemove(taskId, function (err) {
+    if (err) {
+      console.log(err);
+      res.redirect("/");
+    } else {
+      res.redirect("/?message=delete_success");
+    }
+  });
 });
 
-app.listen(8000, () => {
-  console.log("Server running at http://localhost:8000");
+// POST /toggle/:id - mark task completed/uncompleted
+app.post("/toggle/:id", function (req, res) {
+  const taskId = req.params.id;
+  Task.findById(taskId, function (err, task) {
+    if (err || !task) {
+      console.log(err);
+      res.redirect("/");
+    } else {
+      task.completed = !task.completed;
+      task.save((err) => {
+        if (err) console.log(err);
+        res.redirect("/");
+      });
+    }
+  });
+});
+
+// --- Start server ---
+app.listen(PORT, function () {
+  console.log(`🚀 Server is running on port ${PORT}`);
 });

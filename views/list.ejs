@@ -1,39 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Todo List</title>
-  <link rel="stylesheet" href="/css/styles.css">
-</head>
-<body>
-  <header>
-    <h1>✅ Todo List</h1>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo List</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>✅ Todo List</h1>
+    </header>
 
-  <main>
-    <form action="/add" method="POST" class="task-form">
-      <input type="text" name="task" placeholder="Enter a task">
-      <button type="submit">+</button>
-    </form>
+    <main>
+      <!-- Add Task Form -->
+      <form action="/add" method="POST" class="task-form" id="addTaskForm">
+        <input type="text" name="task" placeholder="Enter a task" required />
+        <select name="priority">
+          <option value="Low">Low</option>
+          <option value="High">High</option>
+          <option value="Urgent">Urgent</option>
+        </select>
+        <button type="submit">+</button>
+      </form>
 
-    <ul class="task-list">
-      <% tasks.forEach((task, i) => { %>
-        <li class="<%= task.done ? 'done' : '' %>">
-          <form action="/toggle/<%= i %>" method="POST" style="display:inline;">
-            <input type="checkbox" onchange="this.form.submit()" <%= task.done ? 'checked' : '' %>>
+      <!-- Task List -->
+      <ul class="task-list">
+        <% tasks.forEach((task) => { %>
+        <li class="priority-<%= task.priority.toLowerCase() %> <%= task.completed ? 'completed' : '' %>">
+
+          <!-- Completed Checkbox -->
+          <form action="/toggle/<%= task._id %>" method="POST" class="complete-form">
+            <input type="checkbox" name="completed" onchange="this.form.submit()" <%= task.completed ? 'checked' : '' %> />
           </form>
-          <span><%= task.text %></span>
-          <form action="/delete/<%= i %>" method="POST" style="display:inline;">
-            <button class="delete-btn">✖</button>
-          </form>
+
+          <span> <%= task.title %> (<%= task.priority %>) </span>
+
+          <div class="task-actions">
+
+            <!-- Pencil Icon for Edit -->
+            <button type="button" class="edit-btn" onclick="document.getElementById('editForm-<%= task._id %>').style.display='inline'">✏️</button>
+
+            <form id="editForm-<%= task._id %>" action="/edit/<%= task._id %>" method="POST" style="display:none;" class="action-form">
+              <select name="priority">
+                <option value="Low" <%= task.priority === 'Low' ? 'selected' : '' %>>Low</option>
+                <option value="High" <%= task.priority === 'High' ? 'selected' : '' %>>High</option>
+                <option value="Urgent" <%= task.priority === 'Urgent' ? 'selected' : '' %>>Urgent</option>
+              </select>
+              <button type="submit">✔️</button>
+            </form>
+
+            <form action="/delete/<%= task._id %>" method="POST" class="action-form" onsubmit="return confirm('Are you sure you want to delete this task?');">
+              <button class="delete-btn">🗑️</button>
+            </form>
+          </div>
         </li>
-      <% }) %>
-    </ul>
-  </main>
+        <% }) %>
+      </ul>
+    </main>
 
-  <footer>
-    <p>© 2025 Todo App | Node.js + EJS</p>
-  </footer>
-</body>
+    <footer>
+      <p>© 2025 Todo App | Node.js + EJS</p>
+    </footer>
+
+    <script>
+      // Client-side alerts
+      document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get("message");
+
+        if (message) {
+          switch (message) {
+            case "add_success": alert("Task added successfully!"); break;
+            case "update_success": alert("Task updated successfully!"); break;
+            case "delete_success": alert("Task deleted successfully!"); break;
+            case "empty_task": alert("Task title cannot be empty!"); break;
+          }
+          window.history.replaceState({}, document.title, "/");
+        }
+      });
+    </script>
+  </body>
 </html>

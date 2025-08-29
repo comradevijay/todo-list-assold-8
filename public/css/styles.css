@@ -22,10 +22,13 @@ header {
 main {
   flex: 1;
   width: 100%;
-  max-width: 500px;
+  max-width: 600px;
   margin: 30px auto;
+  padding: 0 15px;
 }
-
+.complete-form{
+  padding-right: 20px;
+}
 .task-form {
   display: flex;
   margin-bottom: 20px;
@@ -36,6 +39,18 @@ main {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px 0 0 5px;
+}
+
+.task-form input:focus {
+  outline: none;
+}
+
+.task-form select,
+.action-form select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  background: white;
+  border-left: none;
 }
 
 .task-form button {
@@ -57,22 +72,50 @@ main {
   align-items: center;
   justify-content: space-between;
   background: white;
-  padding: 10px;
+  padding: 15px;
   margin-bottom: 10px;
   border-radius: 5px;
+  border-left: 5px solid #ccc;
 }
 
-.task-list li.done span {
+/* Priority-based styling */
+.task-list li.priority-low { border-left-color: #28a745; }
+.task-list li.priority-high { border-left-color: #ffc107; }
+.task-list li.priority-urgent { border-left-color: #dc3545; }
+
+.task-list li span {
+  flex-grow: 1;
+  margin-right: 15px;
+}
+
+/* Completed task */
+.task-list li.completed span {
   text-decoration: line-through;
   color: gray;
+}
+
+.task-actions {
+  display: flex;
+  align-items: center;
+}
+
+.action-form {
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.action-form select {
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .delete-btn {
   background: none;
   border: none;
   color: red;
-  font-size: 16px;
+  font-size: 20px;
   cursor: pointer;
+  padding: 0 5px;
 }
 
 footer {
