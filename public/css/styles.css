@@ -9,7 +9,7 @@ body {
   display: flex; 
   flex-direction: column; 
   min-height: 100vh; 
-  background: #f4f4f4; 
+  background-color: #e6e0e0;
 }
 
 header { 
@@ -25,6 +25,10 @@ main {
   max-width: 600px; 
   margin: 20px auto; 
   padding: 0 10px; 
+}
+.container{
+  display: flex;
+  gap: 20px;
 }
 
 .task-form, .filter-form { 
@@ -55,6 +59,16 @@ main {
   text-decoration: line-through; 
   color: gray; 
 }
+
+.filter-form label{
+  margin-top: 7px;
+}
+
+.edit-but{
+  height: 20px;
+}
+
+
 
 .delete-btn { 
   background: none; 

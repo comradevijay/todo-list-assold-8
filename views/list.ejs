@@ -8,10 +8,11 @@
 </head>
 <body>
   <header>
-    <h1>📝 My Todo List</h1>
+    <h1>My Todo List</h1>
   </header>
 
   <main>
+    <div class="container">
     <!-- Add Task -->
     <form action="/add" method="POST" class="task-form">
       <input type="text" name="task" placeholder="Enter your task" required />
@@ -33,6 +34,7 @@
         <option value="high" <%= filter==='high' ? 'selected' : '' %>>High</option>
       </select>
     </form>
+    </div>
 
     <!-- Task List -->
     <ul class="task-list">
@@ -49,12 +51,12 @@
           <!-- Edit -->
           <form action="/edit/<%= i %>?_method=PUT" method="POST" style="display:inline;">
             <input type="text" name="task" placeholder="Edit task" />
-            <button>✏️</button>
+            <button class="edit-but">✎</button>
           </form>
 
           <!-- Delete -->
           <form action="/delete/<%= i %>?_method=DELETE" method="POST" style="display:inline;">
-            <button class="delete-btn">🗑</button>
+            <button class="delete-btn">X</button>
           </form>
         </li>
       <% }) %>
