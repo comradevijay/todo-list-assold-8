@@ -1,13 +1,12 @@
 const express = require("express");
-const methodOverride = require("method-override"); // 1. Require the package
+const methodOverride = require("method-override");
 const app = express();
 
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
-app.use(methodOverride("_method")); // 2. Use the middleware
+app.use(methodOverride("_method"));
 
-// In-memory storage
 let tasks = [];
 
 app.get("/", (req, res) => {
@@ -16,16 +15,13 @@ app.get("/", (req, res) => {
 
 app.post("/add", (req, res) => {
   const task = req.body.task;
-  if (task.trim() === "") {
-    return res.send(
-      "<script>alert('Task cannot be empty'); window.location.href='/'</script>"
-    );
+  if (!task || !task.trim()) {
+    return res.redirect("/");
   }
-  tasks.push({ text: task, done: false });
+  tasks.push({ text: task.trim(), done: false });
   res.redirect("/");
 });
 
-// 3. Changed from app.post to app.put
 app.put("/toggle/:index", (req, res) => {
   const index = req.params.index;
   if (tasks[index]) {
@@ -34,7 +30,6 @@ app.put("/toggle/:index", (req, res) => {
   res.redirect("/");
 });
 
-// 4. Changed from app.post to app.delete
 app.delete("/delete/:index", (req, res) => {
   const index = req.params.index;
   if (tasks[index]) {
