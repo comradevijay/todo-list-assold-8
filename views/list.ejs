@@ -1,42 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Todo List</title>
-    <link rel="stylesheet" href="/css/styles.css" />
-  </head>
-  <body>
-    <header>
-      <h1>✅ Todo List</h1>
-    </header>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Todo List</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>📝 My Todo List</h1>
+  </header>
 
-    <main>
-      <form action="/add" method="POST" class="task-form">
-        <input type="text" name="task" placeholder="Enter a task" />
-        <button type="submit">+</button>
-      </form>
+  <main>
+    <!-- Add Task -->
+    <form action="/add" method="POST" class="task-form">
+      <input type="text" name="task" placeholder="Enter your task" required />
+      <select name="priority">
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
+      <button type="submit">Add</button>
+    </form>
 
-      <ul class="task-list">
-        <% tasks.forEach((task, i) => { %>
+    <!-- Filter by priority -->
+    <form method="GET" action="/" class="filter-form">
+      <label>Filter:</label>
+      <select name="priority" onchange="this.form.submit()">
+        <option value="all" <%= filter==='all' ? 'selected' : '' %>>All</option>
+        <option value="low" <%= filter==='low' ? 'selected' : '' %>>Low</option>
+        <option value="medium" <%= filter==='medium' ? 'selected' : '' %>>Medium</option>
+        <option value="high" <%= filter==='high' ? 'selected' : '' %>>High</option>
+      </select>
+    </form>
+
+    <!-- Task List -->
+    <ul class="task-list">
+      <% tasks.forEach((task, i) => { %>
         <li class="<%= task.done ? 'done' : '' %>">
+          <!-- Toggle -->
           <form action="/toggle/<%= i %>?_method=PUT" method="POST" style="display:inline;">
-            <input type="checkbox" onchange="this.form.submit()" <%=
-            task.done ? 'checked' : '' %>>
+            <input type="checkbox" onchange="this.form.submit()" <%= task.done ? 'checked' : '' %> />
           </form>
 
-          <span><%= task.text %></span>
-          
+          <!-- Text -->
+          <span><%= task.text %> (<%= task.priority %>)</span>
+
+          <!-- Edit -->
+          <form action="/edit/<%= i %>?_method=PUT" method="POST" style="display:inline;">
+            <input type="text" name="task" placeholder="Edit task" />
+            <button>✏️</button>
+          </form>
+
+          <!-- Delete -->
           <form action="/delete/<%= i %>?_method=DELETE" method="POST" style="display:inline;">
-            <button class="delete-btn">✖</button>
+            <button class="delete-btn">🗑</button>
           </form>
         </li>
-        <% }) %>
-      </ul>
-    </main>
+      <% }) %>
+    </ul>
+  </main>
 
-    <footer>
-      <p>© 2025 Todo App | Node.js + EJS</p>
-    </footer>
-  </body>
+  <footer>
+    <p>© 2025 Todo App | Built with Node.js + EJS</p>
+  </footer>
+</body>
 </html>
