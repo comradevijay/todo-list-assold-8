@@ -1,63 +1,68 @@
 const express = require("express");
-const methodOverride = require("method-override");
+const bodyParser = require("body-parser");
 
 const app = express();
 app.set("view engine", "ejs");
-app.use(express.static("public"));
+app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
-app.use(methodOverride("_method"));
 
-// In-memory storage
-let tasks = [];  // each task: { text, done, priority }
+let items = [];
 
-// Home page
 app.get("/", (req, res) => {
-  const filter = req.query.priority || "all";
-  let filteredTasks = tasks;
-
-  if (filter !== "all") {
-    filteredTasks = tasks.filter(t => t.priority === filter);
-  }
-
-  res.render("list", { tasks: filteredTasks, filter });
+  res.render("list", { todoItems: items });
 });
 
-// Add a task
 app.post("/add", (req, res) => {
-  const { task, priority } = req.body;
+  const todoText = req.body.ele1;
 
-  if (!task || !task.trim()) {
-    return res.send("<script>alert('Task cannot be empty!'); window.location='/';</script>");
+  if (!todoText || todoText.trim() === "") {
+    return res.send("<script>alert('Task cannot be empty!'); window.location.href='/'</script>");
   }
 
-  tasks.push({ text: task.trim(), done: false, priority: priority || "low" });
-  res.redirect("/");
+  const newTodo = {
+    id: Date.now().toString(),
+    text: todoText,
+    priority: req.body.priority || "low"
+  };
+
+  items.push(newTodo);
+  res.redirect("/"); 
 });
 
-// Toggle done/undone
-app.put("/toggle/:index", (req, res) => {
-  const idx = req.params.index;
-  if (tasks[idx]) tasks[idx].done = !tasks[idx].done;
-  res.redirect("/");
-});
+app.post("/edit/:id", (req, res) => {
+  const idToEdit = req.params.id;
+  const newText = req.body.newText;
 
-// Edit task
-app.put("/edit/:index", (req, res) => {
-  const idx = req.params.index;
-  const newText = req.body.task;
-  if (tasks[idx] && newText.trim()) {
-    tasks[idx].text = newText.trim();
+  if (!newText || newText.trim() === "") {
+    return res.send("<script>alert('Updated task cannot be empty!'); window.location.href='/'</script>");
   }
+
+  items = items.map(item =>
+    item.id === idToEdit ? { ...item, text: newText } : item
+  );
+
   res.redirect("/");
 });
 
-// Delete task
-app.delete("/delete/:index", (req, res) => {
-  const idx = req.params.index;
-  if (tasks[idx]) tasks.splice(idx, 1);
+app.post("/delete/:id", (req, res) => {
+  const idToDelete = req.params.id;
+
+  items = items.filter(item => item.id !== idToDelete);
   res.redirect("/");
 });
 
-app.listen(8000, () => {
-  console.log("✅ Server started on http://localhost:8000");
+app.get("/filter", (req, res) => {
+  const priority = req.query.priority;
+
+  if (priority === "all") {
+    return res.render("list", { todoItems: items });
+  }
+
+  const filteredItems = items.filter(item => item.priority === priority);
+  res.render("list", { todoItems: filteredItems });
+});
+
+
+app.listen(8000, function() {
+  console.log("Server started successfully on port 8000.");
 });
