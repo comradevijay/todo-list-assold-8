@@ -22,14 +22,14 @@ const item = mongoose.model("task", taskSchema);
 app.get("/", function(req, res){
     item.find({})
         .then(foundItems => {
-            res.render("list", { todoItems: foundItems });
+            res.render("list", { todoItems: foundItems, selectedPriority: "all" });
         })
         .catch(err => console.log(err));
 });
 
 app.post("/", function(req, res){
     const itemName = req.body.ele1;
-    const priority = req.body.priority || "Low";
+    const priority = req.body.priority || "low";
 
     if (!itemName.trim()) {
         return res.send("<script>alert('Task cannot be empty');window.location='/';</script>");
@@ -61,17 +61,16 @@ app.post("/edit/:id", (req, res) => {
         .catch(err => console.log(err));
 });
 
-
 app.get("/filter", (req, res) => {
     const priority = req.query.priority;
 
     if (priority === "all") {
         item.find({})
-            .then(allTasks => res.render("list", { todoItems: allTasks }))
+            .then(allTasks => res.render("list", { todoItems: allTasks, selectedPriority: "all" }))
             .catch(err => console.log(err));
     } else {
         item.find({ priority: priority })
-            .then(filtered => res.render("list", { todoItems: filtered }))
+            .then(filtered => res.render("list", { todoItems: filtered, selectedPriority: priority }))
             .catch(err => console.log(err));
     }
 });

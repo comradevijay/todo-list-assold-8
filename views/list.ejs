@@ -38,10 +38,10 @@
               class="drop-down"
               id="filter-drop"
             >
-              <option value="all">All</option>
-              <option value="high">High</option>
-              <option value="medium">Medium</option>
-              <option value="low">Low</option>
+              <option value="all" <%= selectedPriority === "all" ? "selected" : "" %>>All</option>
+              <option value="high" <%= selectedPriority === "high" ? "selected" : "" %>>High</option>
+              <option value="medium" <%= selectedPriority === "medium" ? "selected" : "" %>>Medium</option>
+              <option value="low" <%= selectedPriority === "low" ? "selected" : "" %>>Low</option>
             </select>
           </form>
         </div>
