@@ -14,7 +14,7 @@
     <main>
       <div class="box">
         <div class="container">
-          <form action="/add" method="POST">
+          <form action="/" method="POST">
             <input
               type="text"
               name="ele1"
@@ -54,7 +54,7 @@
           <% todoItems.forEach(function(todo){ %>
           <li class="item">
             <input type="checkbox" />
-            <p class="added-tasks"><%= todo.text %> - <%= todo.priority %></p>
+            <p class="added-tasks"><%= todo.name%> - <%= todo.priority%></p>
 
             <form
               action="/edit/<%= todo.id %>"

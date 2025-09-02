@@ -1,68 +1,81 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 
-const app = express();
+var app = express();
 app.set("view engine", "ejs");
-app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
 
-let items = [];
-
-app.get("/", (req, res) => {
-  res.render("list", { todoItems: items });
+const mongoose = require("mongoose");
+mongoose.connect("mongodb+srv://vijay:vijay@todoadmin.llaun5y.mongodb.net/todo?retryWrites=true&w=majority&appName=todoAdmin", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
 });
 
-app.post("/add", (req, res) => {
-  const todoText = req.body.ele1;
-
-  if (!todoText || todoText.trim() === "") {
-    return res.send("<script>alert('Task cannot be empty!'); window.location.href='/'</script>");
-  }
-
-  const newTodo = {
-    id: Date.now().toString(),
-    text: todoText,
-    priority: req.body.priority || "low"
-  };
-
-  items.push(newTodo);
-  res.redirect("/"); 
+const taskSchema = new mongoose.Schema({
+    name: String,
+    priority: { type: String, enum: ["low","medium", "high"], default: "low" }
 });
 
-app.post("/edit/:id", (req, res) => {
-  const idToEdit = req.params.id;
-  const newText = req.body.newText;
+const item = mongoose.model("task", taskSchema);
 
-  if (!newText || newText.trim() === "") {
-    return res.send("<script>alert('Updated task cannot be empty!'); window.location.href='/'</script>");
-  }
+app.get("/", function(req, res){
+    item.find({})
+        .then(foundItems => {
+            res.render("list", { todoItems: foundItems });
+        })
+        .catch(err => console.log(err));
+});
 
-  items = items.map(item =>
-    item.id === idToEdit ? { ...item, text: newText } : item
-  );
+app.post("/", function(req, res){
+    const itemName = req.body.ele1;
+    const priority = req.body.priority || "Low";
 
-  res.redirect("/");
+    if (!itemName.trim()) {
+        return res.send("<script>alert('Task cannot be empty');window.location='/';</script>");
+    }
+
+    const todo = new item({ name: itemName, priority: priority });
+    todo.save()
+        .then(() => res.send("<script>alert('Task added successfully');window.location='/';</script>"))
+        .catch(err => console.log(err));
 });
 
 app.post("/delete/:id", (req, res) => {
-  const idToDelete = req.params.id;
-
-  items = items.filter(item => item.id !== idToDelete);
-  res.redirect("/");
+    const id = req.params.id;
+    item.findByIdAndDelete(id)
+        .then(() => res.send("<script>alert('Task deleted successfully');window.location='/';</script>"))
+        .catch(err => console.log(err));
 });
+
+app.post("/edit/:id", (req, res) => {
+    const id = req.params.id;
+    const updatedText = req.body.newText || ""; 
+
+    if (!updatedText.trim()) {
+        return res.send("<script>alert('Task cannot be empty');window.location='/';</script>");
+    }
+
+    item.findByIdAndUpdate(id, { name: updatedText })
+        .then(() => res.send("<script>alert('Task updated successfully');window.location='/';</script>"))
+        .catch(err => console.log(err));
+});
+
 
 app.get("/filter", (req, res) => {
-  const priority = req.query.priority;
+    const priority = req.query.priority;
 
-  if (priority === "all") {
-    return res.render("list", { todoItems: items });
-  }
-
-  const filteredItems = items.filter(item => item.priority === priority);
-  res.render("list", { todoItems: filteredItems });
+    if (priority === "all") {
+        item.find({})
+            .then(allTasks => res.render("list", { todoItems: allTasks }))
+            .catch(err => console.log(err));
+    } else {
+        item.find({ priority: priority })
+            .then(filtered => res.render("list", { todoItems: filtered }))
+            .catch(err => console.log(err));
+    }
 });
 
-
-app.listen(8000, function() {
-  console.log("Server started successfully on port 8000.");
+app.listen(8000, function(){
+    console.log("Server is running on port 8000");
 });
